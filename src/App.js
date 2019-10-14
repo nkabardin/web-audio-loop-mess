@@ -12,55 +12,72 @@ const evelopeSettings = {"attack": 0.1,
 	"sustain": 2.0,
 	"release": 0.8}
 
-const envelope1 = new Tone.AmplitudeEnvelope(Object.assign({}, evelopeSettings)).toMaster();
-
-const playerBassLoop = new Tone.Player({
-  "url" : BassLoop,
-  "autostart" : false,
-  "loop": true,
-  "volume": 0,
-  "onload": () => playerBassLoop.start()
-}).connect(envelope1)
-
-const envelope2 = new Tone.AmplitudeEnvelope(Object.assign({}, evelopeSettings)).toMaster();
+let envelope1;
+let envelope2;
+let envelope3;
+let envelope4;
 
 
-const playerBeatLoop = new Tone.Player({
-  "url" : BeatLoop,
-  "autostart" : false,
-  "loop": true,
-  "volume": 0,
-  "onload": () => playerBeatLoop.start()
-}).connect(envelope2)
+let playerBassLoop;
+let playerBeatLoop;
+let playerTexture1;
+let playerTexture2
 
-const envelope3 = new Tone.AmplitudeEnvelope(Object.assign({}, evelopeSettings)).toMaster();
+let initEverything = () => {
+  envelope1 = new Tone.AmplitudeEnvelope(Object.assign({}, evelopeSettings)).toMaster();
 
-const playerTexture1 = new Tone.Player({
-  "url" : Texture1,
-  "autostart" : false,
-  "loop": true,
-  "volume": 0,
-  "onload": () => playerTexture1.start()
-}).connect(envelope3)
+  playerBassLoop = new Tone.Player({
+    "url" : BassLoop,
+    "autostart" : false,
+    "loop": true,
+    "volume": 0,
+    "onload": () => playerBassLoop.start()
+  }).connect(envelope1)
 
-const envelope4 = new Tone.AmplitudeEnvelope(Object.assign({}, evelopeSettings)).toMaster();
+  envelope2 = new Tone.AmplitudeEnvelope(Object.assign({}, evelopeSettings)).toMaster();
+
+  playerBeatLoop = new Tone.Player({
+    "url" : BeatLoop,
+    "autostart" : false,
+    "loop": true,
+    "volume": 0,
+    "onload": () => playerBeatLoop.start()
+  }).connect(envelope2)
+
+  envelope3 = new Tone.AmplitudeEnvelope(Object.assign({}, evelopeSettings)).toMaster();
+
+  playerTexture1 = new Tone.Player({
+    "url" : Texture1,
+    "autostart" : false,
+    "loop": true,
+    "volume": 0,
+    "onload": () => playerTexture1.start()
+  }).connect(envelope3)
+
+  envelope4 = new Tone.AmplitudeEnvelope(Object.assign({}, evelopeSettings)).toMaster();
 
 
-const playerTexture2 = new Tone.Player({
-  "url" : Texture2,
-  "autostart" : false,
-  "loop": true,
-  "volume": 0,
-  "onload": () => playerTexture2.start()
-}).connect(envelope4)
+  playerTexture2 = new Tone.Player({
+    "url" : Texture2,
+    "autostart" : false,
+    "loop": true,
+    "volume": 0,
+    "onload": () => playerTexture2.start()
+  }).connect(envelope4)
 
-
+}
 
 class LoopPlayer {
   constructur(loop) {}
 }
 
+let started = false;
+
 const init = () => {
+  initEverything();
+
+  started = true;
+
   function step(timestamp) {
     window.requestAnimationFrame(step);
   }
@@ -69,7 +86,12 @@ const init = () => {
 }
 
 const onMessage = (message) => {
+  if(!started) {
+    return
+  }
+
   const data = JSON.parse(message.data)
+  console.log(data.event)
   if (data.event === "job_updated") {
     envelope4.triggerAttackRelease('4t')
   }
@@ -93,11 +115,11 @@ ws.onmessage = onMessage;
 
 function App() {
   useEffect(() => {
-    init();
+
   })
   return (
     <div className="App">
-      hey
+      <button style={{fontSize: '50px'}} onClick={() => init()}>run it</button>
     </div>
   );
 }
