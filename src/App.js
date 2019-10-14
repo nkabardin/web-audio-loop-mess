@@ -18,7 +18,8 @@ const playerBassLoop = new Tone.Player({
   "url" : BassLoop,
   "autostart" : false,
   "loop": true,
-  "volume": 0
+  "volume": 0,
+  "onload": () => playerBassLoop.start()
 }).connect(envelope1)
 
 const envelope2 = new Tone.AmplitudeEnvelope(Object.assign({}, evelopeSettings)).toMaster();
@@ -28,7 +29,8 @@ const playerBeatLoop = new Tone.Player({
   "url" : BeatLoop,
   "autostart" : false,
   "loop": true,
-  "volume": 0
+  "volume": 0,
+  "onload": () => playerBeatLoop.start()
 }).connect(envelope2)
 
 const envelope3 = new Tone.AmplitudeEnvelope(Object.assign({}, evelopeSettings)).toMaster();
@@ -37,7 +39,8 @@ const playerTexture1 = new Tone.Player({
   "url" : Texture1,
   "autostart" : false,
   "loop": true,
-  "volume": 0
+  "volume": 0,
+  "onload": () => playerTexture1.start()
 }).connect(envelope3)
 
 const envelope4 = new Tone.AmplitudeEnvelope(Object.assign({}, evelopeSettings)).toMaster();
@@ -47,15 +50,11 @@ const playerTexture2 = new Tone.Player({
   "url" : Texture2,
   "autostart" : false,
   "loop": true,
-  "volume": 0
+  "volume": 0,
+  "onload": () => playerTexture2.start()
 }).connect(envelope4)
 
-const play = () => {
-  playerBassLoop.start(1)
-  playerBeatLoop.start(1)
-  playerTexture1.start(1)
-  playerTexture2.start(1)
-}
+
 
 class LoopPlayer {
   constructur(loop) {}
@@ -69,6 +68,28 @@ const init = () => {
   window.requestAnimationFrame(step);
 }
 
+const onMessage = (message) => {
+  const data = JSON.parse(message.data)
+  if (data.event === "job_updated") {
+    envelope4.triggerAttackRelease('4t')
+  }
+
+  if (data.event === "job_finished") {
+    envelope3.triggerAttackRelease('4t')
+  }
+
+  if (data.event === "build") {
+    envelope2.triggerAttackRelease('4t')
+  }
+
+  if (data.event === "job") {
+    envelope1.triggerAttackRelease('4t')
+  }
+}
+
+const ws = new WebSocket("wss://travis.durieux.me");
+ws.onmessage = onMessage;
+
 
 function App() {
   useEffect(() => {
@@ -77,42 +98,6 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <a
-          className="App-link"
-          onClick={() => play()}
-          href="#"
-        >
-          play dis shit
-        </a>
-        <div style={{
-          cursor: "pointer",
-          width: "100px",
-          height: "100px",
-          backgroundColor: "#430578"
-        }}
-        onClick={() => {envelope1.triggerAttackRelease('4t')}}> </div>
-        <div style={{
-          cursor: "pointer",
-          width: "100px",
-          height: "100px",
-          backgroundColor: "#111439"
-        }}
-        onClick={() => {envelope2.triggerAttackRelease('4t')}}> </div>
-        <div style={{
-          cursor: "pointer",
-          width: "100px",
-          height: "100px",
-          backgroundColor: "#FFC0C0"
-        }}
-        onClick={() => {envelope3.triggerAttackRelease('4t')}}> </div>
-        <div style={{
-          cursor: "pointer",
-          width: "100px",
-          height: "100px",
-          backgroundColor: "#12F0C5"
-        }}
-        onClick={() => {envelope4.triggerAttackRelease('4t')}}> </div>
-      </header>
     </div>
   );
 }
