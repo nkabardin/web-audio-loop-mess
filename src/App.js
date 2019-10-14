@@ -7,6 +7,9 @@ import Texture1 from './texture1.mp3';
 import Texture2 from './texture2.mp3';
 import Tone from 'tone';
 
+
+import seb from './seb';
+
 const evelopeSettings = {"attack": 0.1,
 	"decay": 0.4,
 	"sustain": 2.0,
@@ -91,6 +94,9 @@ const onMessage = (message) => {
   }
 
   const data = JSON.parse(message.data)
+
+  seb(data);
+
   console.log(data.event)
   if (data.event === "job_updated") {
     envelope4.triggerAttackRelease('4t')
